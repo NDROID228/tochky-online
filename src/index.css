@@ -24,10 +24,8 @@ a:hover {
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+  width: 100vw;
+  height: 100vh;
 }
 
 h1 {
@@ -52,6 +50,23 @@ button:hover {
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
+}
+input[type="text"] {
+  font: 15px/24px Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  color: #333;
+  width: 100%;
+  box-sizing: border-box;
+  letter-spacing: 1px;
+}
+
+:focus {
+  outline: none;
+}
+#root {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  text-align: center;
 }
 
 @media (prefers-color-scheme: light) {
