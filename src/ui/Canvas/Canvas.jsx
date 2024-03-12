@@ -2,7 +2,7 @@ import React, { useEffect, useState, useLayoutEffect } from "react";
 import { Stage, Layer, Circle, Line } from "react-konva";
 // import getWindowSize from "../../usefulFunctions/getWindowSize";
 
-const Canvas = () => {
+const Canvass = () => {
   const [windowSize, setWindowSize] = useState({
     width: window.innerWidth,
     height: window.innerHeight,
@@ -34,4 +34,4 @@ const Canvas = () => {
   );
 };
 
-export default Canvas;
+export default Canvass;

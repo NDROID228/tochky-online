@@ -1,6 +1,7 @@
 import { useState } from "react";
 import "./MainMenu.css";
 import useRandomNumbers from "../../usefulFunctions/Generate4Numbers";
+import Canvass from "../../ui/Canvas/Canvas";
 
 const MainApp = () => {
   const [user, setUser] = useState();
@@ -34,7 +35,7 @@ const MainApp = () => {
           </select>
         </side> */}
       {isOpen && (
-        <section>
+        <section style={{position:"absolute", zIndex:"2"}}>
           <div className="box-logo">
             <img src="/tmp_logo.svg" alt="Logo" />
             <h1 className="title">Tochky online</h1>
@@ -55,7 +56,7 @@ const MainApp = () => {
           </form>
         </section>
       )}
-
+      <Canvass />
       {/* <side>
           <div name="language" id="language">
               <button id="player_settings"></button>
