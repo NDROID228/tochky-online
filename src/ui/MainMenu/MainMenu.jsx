@@ -2,7 +2,7 @@ import { useState } from "react";
 import "./MainMenu.css";
 import useRandomNumbers from "../../usefulFunctions/Generate4Numbers";
 
-const MainMenu = () => {
+const MainApp = () => {
   const [user, setUser] = useState();
   const [isOpen, setIsOpen] = useState(true);
   const { concatenatedNumber } = useRandomNumbers();
@@ -65,4 +65,4 @@ const MainMenu = () => {
   );
 };
 
-export default MainMenu;
+export default MainApp;
