@@ -19,8 +19,8 @@ const MainMenu = () => {
     } else {
       document.cookie = `currentUsername= Player_${concatenatedNumber}`;
     }
-  };
-  
+  }; 
+
   return (
     <main>
       {/* <side>
