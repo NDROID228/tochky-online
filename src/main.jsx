@@ -6,5 +6,5 @@ import MainMenu from './ui/MainMenu/MainMenu.jsx'
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <MainMenu />
-  </React.StrictMode>,
+  </React.StrictMode>, 
 )
