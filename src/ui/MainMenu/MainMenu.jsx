@@ -2,8 +2,14 @@ import { useState } from "react";
 import "./MainMenu.css";
 import useRandomNumbers from "../../usefulFunctions/Generate4Numbers";
 import Canvass from "../../ui/Canvas/Canvas";
+import createCounter from "../../store/mapStore";
 
 const MainApp = () => {
+  const counter = createCounter();
+  console.log(counter.value);
+  counter.increment()
+
+  console.log(counter.value);
   const [user, setUser] = useState();
   const [isOpen, setIsOpen] = useState(true);
   const { concatenatedNumber } = useRandomNumbers();
