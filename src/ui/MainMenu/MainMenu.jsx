@@ -19,7 +19,7 @@ const MainApp = () => {
     } else {
       document.cookie = `currentUsername= Player_${concatenatedNumber}`;
     }
-  }; 
+  };
 
   return (
     <main>

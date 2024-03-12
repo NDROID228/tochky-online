@@ -11,7 +11,7 @@ function useRandomNumbers() {
 
   const randomNumbers = generateRandomNumbers();
   const concatenatedNumber = parseInt(randomNumbers.join(""));
-  
+
   return {
     concatenatedNumber,
   };
