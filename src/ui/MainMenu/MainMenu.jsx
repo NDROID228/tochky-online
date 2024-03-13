@@ -23,7 +23,7 @@ const MainApp = () => {
   };
 
   return (
-    <main>
+    <main style={{backgroundColor: "gray"}}>
       {/* <side>
           <select name="language" id="language">
             <option selected value="en">
