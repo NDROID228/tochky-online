@@ -3,48 +3,61 @@
 
 // const GRID_SIZE = 50; // Размер ячейки сетки
 // const CANVAS_SIZE = 5000; // Размер канваса
+// const STEP = 5; // Шаг движения
 
-// const Canvass = () => {
-//   const [stagePos, setStagePos] = useState({ x: CANVAS_SIZE / 2, y: CANVAS_SIZE / 2 });
-//   const [keyPressed, setKeyPressed] = useState({});
+//   const Canvass = () => {
+//     const [stagePos, setStagePos] = useState({ x: CANVAS_SIZE / 2, y: CANVAS_SIZE / 2 });
+//     const [keyPressed, setKeyPressed] = useState({});
 
-//   useEffect(() => {
-//     const handleKeyDown = (event) => {
-//       setKeyPressed((prev) => ({ ...prev, [event.key]: true }));
-//     };
+//     useEffect(() => {
+//       const handleKeyDown = (event) => {
+//         setKeyPressed((prev) => ({ ...prev, [event.key]: true }));
+//       };
 
-//     const handleKeyUp = (event) => {
-//       setKeyPressed((prev) => ({ ...prev, [event.key]: false }));
-//     };
+//       const handleKeyUp = (event) => {
+//         setKeyPressed((prev) => ({ ...prev, [event.key]: false }));
+//       };
 
-//     window.addEventListener("keydown", handleKeyDown);
-//     window.addEventListener("keyup", handleKeyUp);
+//       window.addEventListener("keydown", handleKeyDown);
+//       window.addEventListener("keyup", handleKeyUp);
 
-//     return () => {
-//       window.removeEventListener("keydown", handleKeyDown);
-//       window.removeEventListener("keyup", handleKeyUp);
-//     };
-//   }, []);
+//       return () => {
+//         window.removeEventListener("keydown", handleKeyDown);
+//         window.removeEventListener("keyup", handleKeyUp);
+//       };
+//     }, []);
 
-//   useEffect(() => {
-//     const moveStage = () => {
-//       const step = 5;
-//       if (keyPressed["w"]) {
-//         setStagePos((prevPos) => ({ ...prevPos, y: Math.max(prevPos.y - step, 0) }));
-//       }
-//       if (keyPressed["a"]) {
-//         setStagePos((prevPos) => ({ ...prevPos, x: Math.max(prevPos.x - step, 0) }));
-//       }
-//       if (keyPressed["s"]) {
-//         setStagePos((prevPos) => ({ ...prevPos, y: Math.min(prevPos.y + step, CANVAS_SIZE) }));
-//       }
-//       if (keyPressed["d"]) {
-//         setStagePos((prevPos) => ({ ...prevPos, x: Math.min(prevPos.x + step, CANVAS_SIZE) }));
-//       }
-//     };
+//     useEffect(() => {
+//       const moveStage = () => {
+//         let deltaX = 0;
+//         let deltaY = 0;
 
-//     moveStage();
-//   }, [keyPressed]);
+//         if (keyPressed["w"]) {
+//           deltaY = -STEP;
+//         }
+//         if (keyPressed["a"]) {
+//           deltaX = -STEP;
+//         }
+//         if (keyPressed["s"]) {
+//           deltaY = STEP;
+//         }
+//         if (keyPressed["d"]) {
+//           deltaX = STEP;
+//         }
+
+//         if (deltaX !== 0 || deltaY !== 0) {
+//           const newPos = { x: stagePos.x + deltaX, y: stagePos.y + deltaY };
+
+//           // Ограничиваем движение, чтобы сцена не выходила за пределы канваса
+//           newPos.x = Math.max(0, Math.min(CANVAS_SIZE, newPos.x));
+//           newPos.y = Math.max(0, Math.min(CANVAS_SIZE, newPos.y));
+
+//           setStagePos(newPos);
+//         }
+//       };
+
+//       moveStage();
+//     }, [keyPressed, stagePos]);
 
 //   const renderGrid = () => {
 //     const lines = [];
@@ -74,7 +87,7 @@
 //       style={{
 //         width: "100vw",
 //         height: "100vh",
-//         touchAction: "pan-y",
+//         // touchAction: "pan-y",
 //         overflow: "hidden",
 //       }}
 //     >
@@ -92,63 +105,67 @@
 import React, { useEffect, useState } from "react";
 import { Stage, Layer, Rect, Line } from "react-konva";
 
-const GRID_SIZE = 75; // Размер ячейки сетки
+const GRID_SIZE = 50; // Размер ячейки сетки
 const CANVAS_SIZE = 5000; // Размер канваса
 const STEP = 5; // Шаг движения
 
-const Canvass = () => {
-  const [stagePos, setStagePos] = useState({ x: CANVAS_SIZE / 2, y: CANVAS_SIZE / 2 });
-  const [keyPressed, setKeyPressed] = useState({});
+  const Canvass = () => {
+    const [stagePos, setStagePos] = useState({ x: CANVAS_SIZE / 2, y: CANVAS_SIZE / 2 });
+    const [keyPressed, setKeyPressed] = useState({});
 
-  useEffect(() => {
-    const handleKeyDown = (event) => {
-      setKeyPressed((prev) => ({ ...prev, [event.key]: true }));
-    };
+    useEffect(() => {
+      const handleKeyDown = (event) => {
+        if (!event.repeat) {
+          setKeyPressed((prev) => ({ ...prev, [event.key]: true }));
+        }
+      };
+    
+      const handleKeyUp = (event) => {
+        setKeyPressed((prev) => ({ ...prev, [event.key]: false }));
+      };
+    
+      window.addEventListener("keydown", handleKeyDown);
+      window.addEventListener("keyup", handleKeyUp);
+    
+      return () => {
+        window.removeEventListener("keydown", handleKeyDown);
+        window.removeEventListener("keyup", handleKeyUp);
+      };
+    }, []);
+    
 
-    const handleKeyUp = (event) => {
-      setKeyPressed((prev) => ({ ...prev, [event.key]: false }));
-    };
+    useEffect(() => {
+      const moveStage = () => {
+        let deltaX = 0;
+        let deltaY = 0;
 
-    window.addEventListener("keydown", handleKeyDown);
-    window.addEventListener("keyup", handleKeyUp);
+        if (keyPressed["w"]) {
+          deltaY = -STEP;
+        }
+        if (keyPressed["a"]) {
+          deltaX = -STEP;
+        }
+        if (keyPressed["s"]) {
+          deltaY = STEP;
+        }
+        if (keyPressed["d"]) {
+          deltaX = STEP;
+        }
 
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-      window.removeEventListener("keyup", handleKeyUp);
-    };
-  }, []);
+        if (deltaX !== 0 || deltaY !== 0) {
+          const newPos = { x: stagePos.x + deltaX, y: stagePos.y + deltaY };
 
-  useEffect(() => {
-    const moveStage = () => {
-      let deltaX = 0;
-      let deltaY = 0;
+          // Ограничиваем движение, чтобы сцена не выходила за пределы канваса
+          newPos.x = Math.max(0, Math.min(CANVAS_SIZE, newPos.x));
+          newPos.y = Math.max(0, Math.min(CANVAS_SIZE, newPos.y));
 
-      if (keyPressed["w"]) {
-        deltaY = -STEP;
-      }
-      if (keyPressed["a"]) {
-        deltaX = -STEP;
-      }
-      if (keyPressed["s"]) {
-        deltaY = STEP;
-      }
-      if (keyPressed["d"]) {
-        deltaX = STEP;
-      }
+          setStagePos(newPos);
+        }
+      };
 
-      if (deltaX !== 0 || deltaY !== 0) {
-        const newPos = { x: stagePos.x + deltaX, y: stagePos.y + deltaY };
-
-        // Ограничиваем движение, чтобы сцена не выходила за пределы канваса
-        newPos.x = Math.max(0, Math.min(CANVAS_SIZE, newPos.x));
-        newPos.y = Math.max(0, Math.min(CANVAS_SIZE, newPos.y));
-
-        setStagePos(newPos);
-      }
-    };
-
-    moveStage();
-  }, [keyPressed, stagePos]);
+      moveStage();
+    }, [keyPressed, stagePos.y, stagePos.x]);
+    // }, [keyPressed, stagePos]);
 
   const renderGrid = () => {
     const lines = [];
@@ -178,7 +195,7 @@ const Canvass = () => {
       style={{
         width: "100vw",
         height: "100vh",
-        touchAction: "pan-y",
+        // touchAction: "pan-y",
         overflow: "hidden",
       }}
     >
