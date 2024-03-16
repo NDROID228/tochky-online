@@ -92,7 +92,7 @@
 import React, { useEffect, useState } from "react";
 import { Stage, Layer, Rect, Line } from "react-konva";
 
-const GRID_SIZE = 50; // Размер ячейки сетки
+const GRID_SIZE = 75; // Размер ячейки сетки
 const CANVAS_SIZE = 5000; // Размер канваса
 const STEP = 5; // Шаг движения
 
