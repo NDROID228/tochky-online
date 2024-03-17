@@ -61,7 +61,7 @@ const MainApp = () => {
           </section>
         </>
       )}
-      <Canvass />
+      <Canvass isOpen={isOpen}/>
       {/* <side>
           <div name="language" id="language">
               <button id="player_settings"></button>
