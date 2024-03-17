@@ -23,7 +23,7 @@ const MainApp = () => {
   };
 
   return (
-    <main style={{backgroundColor: "gray"}}>
+    <main style={{ backgroundColor: "gray" }}>
       {/* <side>
           <select name="language" id="language">
             <option selected value="en">
@@ -34,27 +34,32 @@ const MainApp = () => {
             </option>
           </select>
         </side> */}
+
       {isOpen && (
-        <section style={{position:"absolute", zIndex:"2"}}>
-          <div className="box-logo">
-            <img src="/tmp_logo.svg" alt="Logo" />
-            <h1 className="title">Tochky online</h1>
-          </div>
-          <form id="auth">
-            <div className="for-input">
-              <input
-                className="input-effect"
-                type="text"
-                name="player_name"
-                id="player_name"
-                placeholder="Name"
-                onChange={handleCange}
-              />
-              <span className="focus-border"></span>
+        <>
+          <div className="overlay"></div>
+
+          <section style={{ position: "absolute", zIndex: "2" }}>
+            <div className="box-logo">
+              <img src="/tmp_logo.svg" alt="Logo" />
+              <h1 className="title">Tochky online</h1>
             </div>
-            <button onClick={submitHandler}>Play</button>
-          </form>
-        </section>
+            <form id="auth">
+              <div className="for-input">
+                <input
+                  className="input-effect"
+                  type="text"
+                  name="player_name"
+                  id="player_name"
+                  placeholder="Name"
+                  onChange={handleCange}
+                />
+                <span className="focus-border"></span>
+              </div>
+              <button onClick={submitHandler}>Play</button>
+            </form>
+          </section>
+        </>
       )}
       <Canvass />
       {/* <side>

@@ -104,12 +104,14 @@
 // export default Canvass;
 import React, { useEffect, useState } from "react";
 import { Stage, Layer, Rect, Line } from "react-konva";
+import map from "../../store/mapStore";
 
 const GRID_SIZE = 50; // Размер ячейки сетки
 const CANVAS_SIZE = 5000; // Размер канваса
 const STEP = 5; // Шаг движения
 
   const Canvass = () => {
+    const mapSettings = map()
     const [stagePos, setStagePos] = useState({ x: CANVAS_SIZE / 2, y: CANVAS_SIZE / 2 });
     const [keyPressed, setKeyPressed] = useState({});
 
@@ -154,7 +156,9 @@ const STEP = 5; // Шаг движения
 
         if (deltaX !== 0 || deltaY !== 0) {
           const newPos = { x: stagePos.x + deltaX, y: stagePos.y + deltaY };
-
+          mapSettings.setCurrentPosition(newPos)
+          console.log(mapSettings.currentX);
+          
           // Ограничиваем движение, чтобы сцена не выходила за пределы канваса
           newPos.x = Math.max(0, Math.min(CANVAS_SIZE, newPos.x));
           newPos.y = Math.max(0, Math.min(CANVAS_SIZE, newPos.y));
@@ -165,7 +169,6 @@ const STEP = 5; // Шаг движения
 
       moveStage();
     }, [keyPressed, stagePos.y, stagePos.x]);
-    // }, [keyPressed, stagePos]);
 
   const renderGrid = () => {
     const lines = [];
