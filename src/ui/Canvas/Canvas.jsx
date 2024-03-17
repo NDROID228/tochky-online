@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Stage, Layer, Rect, Line, Circle, Group } from "react-konva";
 import map from "../../store/mapStore";
 
-const GRID_SIZE = 75; // Размер ячейки сетки
-const CANVAS_SIZE = 5000; // Размер канваса
+const GRID_SIZE = 150; // Размер ячейки сетки
+const CANVAS_SIZE = 3000; // Размер канваса
 const STEP = 3; // Шаг движения
 
 const Canvass = ({ isOpen }) => {
@@ -39,6 +39,7 @@ const Canvass = ({ isOpen }) => {
     const moveStage = () => {
       let deltaX = 0;
       let deltaY = 0;
+      console.log(keyPressed);
       const numKeysPressed = Object.values(keyPressed).filter(
         (val) => val
       ).length;
@@ -54,7 +55,9 @@ const Canvass = ({ isOpen }) => {
       if (keyPressed["d"]) {
         deltaX = STEP;
       }
-      if (numKeysPressed === 2) {
+      if (numKeysPressed >= 2) {
+        // deltaX /= 2;
+        // deltaY /= 2;
         deltaX /= 1.4;
         deltaY /= 1.4;
       }
@@ -65,7 +68,7 @@ const Canvass = ({ isOpen }) => {
           newPos.x = Math.max(0, Math.min(CANVAS_SIZE, newPos.x));
           newPos.y = Math.max(0, Math.min(CANVAS_SIZE, newPos.y));
 
-          console.log(newPos);
+          // console.log(newPos);
           return newPos;
         });
       }
@@ -75,15 +78,19 @@ const Canvass = ({ isOpen }) => {
 
   const renderGrid = () => {
     const lines = [];
+    const halfScreenHeight = innerHeight / 2;
+    const halfScreenWidth = innerWidth / 2;
+    // stagePos.y = halfScreenHeight;
+    // console.log(lines);
     for (let i = 0; i <= CANVAS_SIZE; i += GRID_SIZE) {
       lines.push(
         <Line
           key={`line-x-${i}`}
           points={[
-            i - stagePos.x,
-            0 - stagePos.y,
-            i - stagePos.x,
-            CANVAS_SIZE - stagePos.y,
+            i + halfScreenWidth - stagePos.x,
+            0 + halfScreenHeight - stagePos.y,
+            i + halfScreenWidth - stagePos.x,
+            CANVAS_SIZE + halfScreenHeight - stagePos.y,
           ]}
           stroke="#ddd"
           strokeWidth={1}
@@ -93,10 +100,10 @@ const Canvass = ({ isOpen }) => {
         <Line
           key={`line-y-${i}`}
           points={[
-            0 - stagePos.x,
-            i - stagePos.y,
-            CANVAS_SIZE - stagePos.x,
-            i - stagePos.y,
+            0 + halfScreenWidth - stagePos.x, //отсуп от левого края
+            i + halfScreenHeight - stagePos.y,
+            CANVAS_SIZE + halfScreenWidth - stagePos.x,
+            i + halfScreenHeight - stagePos.y,
           ]}
           stroke="#ddd"
           strokeWidth={1}
@@ -125,11 +132,10 @@ const Canvass = ({ isOpen }) => {
             fill="#fff"
           />
 
-          
           {renderGrid()}
           <Circle
-            x={window.innerWidth/2} 
-            y={window.innerHeight/2}
+            x={window.innerWidth / 2}
+            y={window.innerHeight / 2}
             radius={50} // Радиус кружка
             fill="red"
           />
