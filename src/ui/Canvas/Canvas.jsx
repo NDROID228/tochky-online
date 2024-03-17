@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Stage, Layer, Rect, Line } from "react-konva";
+import { Stage, Layer, Rect, Line, Circle, Group } from "react-konva";
 import map from "../../store/mapStore";
 
 const GRID_SIZE = 75; // Размер ячейки сетки
@@ -71,7 +71,6 @@ const Canvass = ({ isOpen }) => {
       }
     };
     moveStage();
-
   }, [keyPressed, stagePos.y, stagePos.x, mapSettings]);
 
   const renderGrid = () => {
@@ -125,9 +124,36 @@ const Canvass = ({ isOpen }) => {
             height={CANVAS_SIZE}
             fill="#fff"
           />
+
+          
           {renderGrid()}
+          <Circle
+            x={window.innerWidth/2} 
+            y={window.innerHeight/2}
+            radius={50} // Радиус кружка
+            fill="red"
+          />
         </Layer>
       </Stage>
+      {/* <Stage x={0} y={0} width={window.innerWidth} height={window.innerHeight}>
+        <Layer>
+          <Rect
+            x={0}
+            y={0}
+            width={500}
+            height={500}
+            fill="black"
+          />
+
+          <Circle
+            x={2} 
+            y={2}
+            radius={500} // Радиус кружка
+            fill="red"
+          />
+          {renderGrid()}
+        </Layer>
+      </Stage> */}
     </div>
   );
 };
