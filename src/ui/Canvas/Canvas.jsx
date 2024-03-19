@@ -2,11 +2,11 @@ import React, { useEffect, useState } from "react";
 import { Stage, Layer, Rect, Line, Circle, Group } from "react-konva";
 import map from "../../store/mapStore";
 
-const GRID_SIZE = 250; // Размер ячейки сетки
+const GRID_SIZE = 150; // Размер ячейки сетки
 const CANVAS_SIZE = 3000; // Размер канваса
-const STEP = 2; // Шаг движения
+const STEP = 3; // Шаг движения
 
-const Canvass = ({ isOpen }) => {
+const Canvass = ({ isOpen, socket }) => {
   const mapSettings = map();
   const [stagePos, setStagePos] = useState({
     x: CANVAS_SIZE / 2,
@@ -15,14 +15,20 @@ const Canvass = ({ isOpen }) => {
   const [keyPressed, setKeyPressed] = useState({});
 
   useEffect(() => {
+    const sendMessage = (msg) => {
+      socket.send(msg);
+    };
+
     const handleKeyDown = (event) => {
       if (!event.repeat) {
         setKeyPressed((prev) => ({ ...prev, [event.key]: true }));
+        sendMessage(JSON.stringify({ type: "keyEvent", body: event.key }));
       }
     };
 
     const handleKeyUp = (event) => {
       setKeyPressed((prev) => ({ ...prev, [event.key]: false }));
+      // sendMessage(event.key);
     };
 
     window.addEventListener("keydown", handleKeyDown);
@@ -58,17 +64,18 @@ const Canvass = ({ isOpen }) => {
       if (numKeysPressed >= 2) {
         // deltaX /= 2;
         // deltaY /= 2;
-        deltaX /= 1.41;
-        deltaY /= 1.41;
+        deltaX /= 1.4;
+        deltaY /= 1.4;
       }
       if (deltaX !== 0 || deltaY !== 0) {
-          setStagePos((prevPos) => {
-            const newPos = { x: prevPos.x + deltaX, y: prevPos.y + deltaY };
-            // Ограничиваем движение, чтобы сцена не выходила за пределы канваса
-            newPos.x = Math.max(0, Math.min(CANVAS_SIZE, newPos.x));
-            newPos.y = Math.max(0, Math.min(CANVAS_SIZE, newPos.y));
-            return newPos;
-          });
+        setStagePos((prevPos) => {
+          const newPos = { x: prevPos.x + deltaX, y: prevPos.y + deltaY };
+          // Ограничиваем движение, чтобы сцена не выходила за пределы канваса
+          newPos.x = Math.max(0, Math.min(CANVAS_SIZE, newPos.x));
+          newPos.y = Math.max(0, Math.min(CANVAS_SIZE, newPos.y));
+          // console.log(newPos);
+          return newPos;
+        });
       }
     };
     moveStage();
@@ -78,6 +85,8 @@ const Canvass = ({ isOpen }) => {
     const lines = [];
     const halfScreenHeight = innerHeight / 2;
     const halfScreenWidth = innerWidth / 2;
+    // stagePos.y = halfScreenHeight;
+    // console.log(lines);
     for (let i = 0; i <= CANVAS_SIZE; i += GRID_SIZE) {
       lines.push(
         <Line
@@ -114,18 +123,12 @@ const Canvass = ({ isOpen }) => {
       style={{
         width: "100vw",
         height: "100vh",
+        // touchAction: "pan-y",
         overflow: "hidden",
       }}
     >
       <Stage x={0} y={0} width={CANVAS_SIZE} height={CANVAS_SIZE}>
         <Layer>
-          <Rect
-            x={0}
-            y={0}
-            width={CANVAS_SIZE}
-            height={CANVAS_SIZE}
-            fill="#fff"
-          />
           <Rect
             x={0}
             y={0}
@@ -143,6 +146,25 @@ const Canvass = ({ isOpen }) => {
           />
         </Layer>
       </Stage>
+      {/* <Stage x={0} y={0} width={window.innerWidth} height={window.innerHeight}>
+        <Layer>
+          <Rect
+            x={0}
+            y={0}
+            width={500}
+            height={500}
+            fill="black"
+          />
+
+          <Circle
+            x={2} 
+            y={2}
+            radius={500} // Радиус кружка
+            fill="red"
+          />
+          {renderGrid()}
+        </Layer>
+      </Stage> */}
     </div>
   );
 };

@@ -95,7 +95,7 @@
 // };
 
 // export default MainApp;
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import "./MainMenu.css";
 import useRandomNumbers from "../../usefulFunctions/Generate4Numbers";
 import Canvass from "../../ui/Canvas/Canvas";
@@ -104,9 +104,9 @@ const MainApp = () => {
   const [user, setUser] = useState('');
   const [isOpen, setIsOpen] = useState(true);
   const { concatenatedNumber } = useRandomNumbers();
-  const [socket, setSocket] = useState(null);
+  const [socket, setSocket] = useState(new WebSocket('ws://localhost:8080'));
 
-  const handleCange = (event) => {
+  const handleChange = (event) => {
     setUser(event.target.value);
   };
 
@@ -121,25 +121,19 @@ const MainApp = () => {
   };
 
   useEffect(() => {
-    const ws = new WebSocket('ws://localhost:8080');
 
-    ws.onopen = () => {
+    socket.onopen = () => {
       console.log('WebSocket connection established');
     };
 
-    ws.onmessage = (event) => {
+    socket.onmessage = (event) => {
       console.log('Received message:', event.data);
     };
 
-    ws.onclose = () => {
+    socket.onclose = () => {
       console.log('WebSocket connection closed');
     };
-
-    setSocket(ws);
-
-    return () => {
-      ws.close();
-    };
+    
   }, []);
 
 
@@ -161,7 +155,7 @@ const MainApp = () => {
                   name="player_name"
                   id="player_name"
                   placeholder="Name"
-                  onChange={handleCange}
+                  onChange={handleChange}
                 />
                 <span className="focus-border"></span>
               </div>
@@ -170,7 +164,7 @@ const MainApp = () => {
           </section>
         </>
       )}
-      <Canvass isOpen={isOpen}/>
+      <Canvass isOpen={isOpen} socket={socket}/>
     </main>
   );
 };
