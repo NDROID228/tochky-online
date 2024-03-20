@@ -15,32 +15,110 @@ const Canvass = ({ isOpen, sendJsonMessage, lastJsonMessage }) => {
   const [keyPressed, setKeyPressed] = useState({});
 
   useEffect(() => {
-    const handleKeyDown = (event) => {
+    const handleClickDown = (event) => {
       if (!event.repeat) {
-        setKeyPressed((prev) => ({ ...prev, [event.key]: true }));
+        if (event.type === "mousedown") {
+          const button =
+            event.button == 0 ? "leftMouseButton" : "rightMouseButton";
+          // console.log(button);
+          setKeyPressed((prev) => ({ ...prev, [button]: false }));
+          sendJsonMessage({
+            type: "keyEvent",
+            body: { key: button, eventType: "keyup" },
+          });
+        } else {
+          setKeyPressed((prev) => ({ ...prev, [event.key]: true }));
+          sendJsonMessage({
+            type: "keyEvent",
+            body: { key: event.key, eventType: "keydown" },
+          });
+        }
+      }
+    };
+
+    const handleClickUp = (event) => {
+      if (event.type === "mouseup") {
+        const button =
+          event.button == 0 ? "leftMouseButton" : "rightMouseButton";
+        // console.log(button);
+        setKeyPressed((prev) => ({ ...prev, [button]: false }));
         sendJsonMessage({
           type: "keyEvent",
-          body: { key: event.key, eventType: "keydown" },
+          body: { key: button, eventType: "keyup" },
+        });
+      } else {
+        setKeyPressed((prev) => ({ ...prev, [event.key]: false }));
+        sendJsonMessage({
+          type: "keyEvent",
+          body: { key: event.key, eventType: "keyup" },
         });
       }
     };
 
-    const handleKeyUp = (event) => {
-      setKeyPressed((prev) => ({ ...prev, [event.key]: false }));
-      sendJsonMessage({
-        type: "keyEvent",
-        body: { key: event.key, eventType: "keyup" },
-      });
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    window.addEventListener("keyup", handleKeyUp);
+    window.addEventListener("keydown", handleClickDown);
+    window.addEventListener("keyup", handleClickUp);
+    window.addEventListener("mousedown", handleClickDown);
+    window.addEventListener("mouseup", handleClickUp);
 
     return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-      window.removeEventListener("keyup", handleKeyUp);
+      window.removeEventListener("keydown", handleClickDown);
+      window.removeEventListener("keyup", handleClickUp);
+      window.removeEventListener("mousedown", handleClickDown);
+      window.removeEventListener("mouseup", handleClickUp);
     };
   }, []);
+
+  
+  const [handPos, setHandPos] = useState({
+    firstHand: { x: -50, y: -50 },
+    secondHand: { x: -50, y: 50 },
+  });
+  const [deg, setDeg] = useState(0);
+  // функція анімації повороту
+  const rotationCalc = (degree) => {
+    console.log(degree);
+    const DEG_TO_RADIANS = 0.0174532925;
+    const RADIUS = 50 * Math.SQRT2;
+    let x1 = Math.cos(degree * DEG_TO_RADIANS) * RADIUS;
+    let y1 = Math.sin(degree * DEG_TO_RADIANS) * RADIUS;
+    let x2 = Math.cos((degree + 90) * DEG_TO_RADIANS) * RADIUS;
+    let y2 = Math.sin((degree + 90) * DEG_TO_RADIANS) * RADIUS;
+
+    setHandPos({
+      firstHand: { x: x1, y: y1 * -1 },
+      secondHand: { x: x2, y: y2 * -1 },
+    });
+    return;
+  };
+  // функція анімації блоку
+  const blockUpCalc = (degree) => {
+    const DEG_TO_RADIANS = 0.0174532925;
+    const RADIUS = 50 * Math.SQRT2;
+    let x1 = Math.cos((degree + 30) * DEG_TO_RADIANS) * RADIUS;
+    let y1 = Math.sin((degree + 30) * DEG_TO_RADIANS) * RADIUS;
+    let x2 = Math.cos((degree + 60) * DEG_TO_RADIANS) * RADIUS;
+    let y2 = Math.sin((degree + 60) * DEG_TO_RADIANS) * RADIUS;
+
+    setHandPos({
+      firstHand: { x: x1, y: y1 * -1 },
+      secondHand: { x: x2, y: y2 * -1 },
+    });
+    return;
+  };
+  // розкоментуй для тесту двох функцій вище
+  // useEffect(() => {
+  //   const timeout = setTimeout(() => {
+  //     setDeg(deg + 10);
+  //   }, 500)
+  //   if(deg % 20 == 0) {
+  //     rotationCalc(deg);
+  //   } else {
+  //     blockUpCalc(deg);
+  //   }
+  //   return () => {
+  //     clearTimeout(timeout);
+  //   }
+  // }, [deg]);
 
   useEffect(() => {
     console.log(lastJsonMessage);
@@ -154,12 +232,26 @@ const Canvass = ({ isOpen, sendJsonMessage, lastJsonMessage }) => {
           />
 
           {renderGrid()}
-          <Circle
-            x={window.innerWidth / 2}
-            y={window.innerHeight / 2}
-            radius={50} // Радиус кружка
-            fill="red"
-          />
+          <Group x={window.innerWidth / 2} y={window.innerHeight / 2}>
+            <Circle
+              x={handPos["firstHand"].x}
+              y={handPos["firstHand"].y}
+              radius={10}
+              fill="#465360"
+            ></Circle>
+            <Circle
+              x={handPos["secondHand"].x}
+              y={handPos["secondHand"].y}
+              radius={10}
+              fill="#385329"
+            ></Circle>
+            <Circle
+              // x={window.innerWidth / 2}
+              // y={window.innerHeight / 2}
+              radius={50} // Радиус кружка
+              fill="red"
+            />
+          </Group>
         </Layer>
       </Stage>
       {/* <Stage x={0} y={0} width={window.innerWidth} height={window.innerHeight}>

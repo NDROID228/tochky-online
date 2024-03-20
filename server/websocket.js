@@ -77,7 +77,6 @@ const closeHandler = (uuid) => {
 wss.on("connection", function connection(ws) {
   console.log("Новий клієнт підключений");
   const uuid = uuidv4(); // Генерація унікального ідентифікатора користувача
-  console.log(uuid);
 
   ws.on("message", function incoming(bytes) {
     const messageObj = JSON.parse(bytes.toString()); // Розпакування отриманого повідомлення
