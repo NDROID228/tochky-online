@@ -6,7 +6,7 @@ const GRID_SIZE = 150; // Размер ячейки сетки
 const CANVAS_SIZE = 3000; // Размер канваса
 const STEP = 3; // Шаг движения
 
-const Canvass = ({ isOpen, socket }) => {
+const Canvass = ({ isOpen, sendJsonMessage, lastJsonMessage }) => {
   const mapSettings = map();
   const [stagePos, setStagePos] = useState({
     x: CANVAS_SIZE / 2,
@@ -15,20 +15,22 @@ const Canvass = ({ isOpen, socket }) => {
   const [keyPressed, setKeyPressed] = useState({});
 
   useEffect(() => {
-    const sendMessage = (msg) => {
-      socket.send(msg);
-    };
-
     const handleKeyDown = (event) => {
       if (!event.repeat) {
         setKeyPressed((prev) => ({ ...prev, [event.key]: true }));
-        sendMessage(JSON.stringify({ type: "keyEvent", body: event.key }));
+        sendJsonMessage({
+          type: "keyEvent",
+          body: { key: event.key, eventType: "keydown" },
+        });
       }
     };
 
     const handleKeyUp = (event) => {
       setKeyPressed((prev) => ({ ...prev, [event.key]: false }));
-      // sendMessage(event.key);
+      sendJsonMessage({
+        type: "keyEvent",
+        body: { key: event.key, eventType: "keyup" },
+      });
     };
 
     window.addEventListener("keydown", handleKeyDown);
@@ -39,6 +41,20 @@ const Canvass = ({ isOpen, socket }) => {
       window.removeEventListener("keyup", handleKeyUp);
     };
   }, []);
+
+  useEffect(() => {
+    console.log(lastJsonMessage);
+
+    if (lastJsonMessage) {
+      switch (lastJsonMessage.type) {
+        case "positionChange":
+          break;
+
+        default:
+          break;
+      }
+    }
+  }, [lastJsonMessage]);
 
   useEffect(() => {
     if (isOpen) return;

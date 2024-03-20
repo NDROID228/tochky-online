@@ -4,13 +4,13 @@
 // import Canvass from "../../ui/Canvas/Canvas";
 
 // const MainApp = () => {
-//   const [user, setUser] = useState();
+//   const [user, setUsername] = useState();
 //   const [isOpen, setIsOpen] = useState(true);
 //   const { concatenatedNumber } = useRandomNumbers();
 //   const [socket, setSocket] = useState(null);
 
 //   const handleCange = (event) => {
-//     setUser(event.target.value);
+//     setUsername(event.target.value);
 //   };
 
 //   const submitHandler = (event) => {
@@ -43,7 +43,6 @@
 //       ws.close();
 //     };
 //   }, []);
-
 
 //   return (
 //     <main style={{ backgroundColor: "gray" }}>
@@ -95,47 +94,53 @@
 // };
 
 // export default MainApp;
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from "react";
 import "./MainMenu.css";
 import useRandomNumbers from "../../usefulFunctions/Generate4Numbers";
 import Canvass from "../../ui/Canvas/Canvas";
+import useWebSocket from "react-use-websocket";
 
 const MainApp = () => {
-  const [user, setUser] = useState('');
+  // websocket configuration
+  const socketUrl = "ws://localhost:8080";
+  const {
+    sendMessage,
+    sendJsonMessage,
+    lastMessage,
+    lastJsonMessage,
+    readyState,
+    getWebSocket,
+  } = useWebSocket(socketUrl, {
+    share: true,
+    onOpen: () => console.log("opened"),
+    //Will attempt to reconnect on all close events, such as server shutting down
+    shouldReconnect: (closeEvent) => true,
+  });
+  // user init logic
   const [isOpen, setIsOpen] = useState(true);
   const { concatenatedNumber } = useRandomNumbers();
-  const [socket, setSocket] = useState(new WebSocket('ws://localhost:8080'));
-
+  const [username, setUsername] = useState("");
   const handleChange = (event) => {
-    setUser(event.target.value);
+    setUsername(event.target.value);
   };
-
   const submitHandler = (event) => {
     event.preventDefault();
     setIsOpen(false);
-    if (user) {
-      document.cookie = `currentUsername=${user}`;
+    if (username) {
+      document.cookie = `currentUsername=${username}`;
+      sendJsonMessage({
+        type: "userReg",
+        body: { name: username },
+      })
     } else {
-      document.cookie = `currentUsername=Player_${concatenatedNumber}`;
+      const userWithoutName = `Player_${concatenatedNumber}`
+      document.cookie = `currentUsername=${userWithoutName}`;
+      sendJsonMessage({
+        type: "userReg",
+        body: { name: userWithoutName },
+      })
     }
   };
-
-  useEffect(() => {
-
-    socket.onopen = () => {
-      console.log('WebSocket connection established');
-    };
-
-    socket.onmessage = (event) => {
-      console.log('Received message:', event.data);
-    };
-
-    socket.onclose = () => {
-      console.log('WebSocket connection closed');
-    };
-    
-  }, []);
-
 
   return (
     <main style={{ backgroundColor: "gray" }}>
@@ -164,7 +169,11 @@ const MainApp = () => {
           </section>
         </>
       )}
-      <Canvass isOpen={isOpen} socket={socket}/>
+      <Canvass
+        isOpen={isOpen}
+        sendJsonMessage={sendJsonMessage}
+        lastJsonMessage={lastJsonMessage}
+      />
     </main>
   );
 };

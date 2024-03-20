@@ -42,6 +42,7 @@ main section form .for-input .input-effect {
   border: 0;
   padding: 4px 0;
   border-bottom: 1px solid #ccc;
+  color: #f8f8f8;
   background-color: transparent;
 }
 .input-effect ~ .focus-border {
@@ -64,7 +65,7 @@ main section form .for-input .input-effect {
   left: 0;
   width: 100%;
   top: 9px;
-  color: #aaa;
+  color: #505050;
   transition: 0.3s;
   z-index: 1;
   letter-spacing: 0.5px;
