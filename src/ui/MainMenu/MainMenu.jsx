@@ -112,14 +112,9 @@ const MainApp = () => {
       document.removeEventListener("contextmenu", disableContextMenu);
     };
   }, []);
-  useLayoutEffect(() => {
-    sendJsonMessage({
-      type: "mapSettings",
-      body: { GRID_SIZE: GRID_SIZE, CANVAS_SIZE: CANVAS_SIZE, STEP: STEP },
-    });
 
-    return () => {};
-  }, []);
+
+
 
   // websocket configuration
   const socketUrl = "ws://localhost:8080";
@@ -141,6 +136,13 @@ const MainApp = () => {
   const { concatenatedNumber } = useRandomNumbers();
   const [username, setUsername] = useState("");
   const { GRID_SIZE, CANVAS_SIZE, STEP } = map();
+
+  useLayoutEffect(() => {
+    sendJsonMessage({
+      type: "mapSettings",
+      body: { GRID_SIZE: GRID_SIZE, CANVAS_SIZE: CANVAS_SIZE, STEP: STEP },
+    });
+  }, [GRID_SIZE,CANVAS_SIZE,STEP]);
   // console.log(GRID_SIZE);
   const handleChange = (event) => {
     setUsername(event.target.value);
