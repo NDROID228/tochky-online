@@ -3,10 +3,6 @@ import { Stage, Layer, Rect, Line, Circle, Group } from "react-konva";
 import map from "../../store/mapStore";
 import useCursorAngleTracker from "../../hooks/useCursorAngleTracker";
 
-const GRID_SIZE = 150; // Размер ячейки сетки
-const CANVAS_SIZE = 3000; // Размер канваса
-const STEP = 3; // Шаг движения
-
 const calculateCoordinates = (angle, radius) => {
   const x = radius * Math.cos((angle * Math.PI) / 180);
   const y = radius * Math.sin((angle * Math.PI) / 180);
@@ -16,6 +12,7 @@ const calculateCoordinates = (angle, radius) => {
 const Canvass = ({ isOpen, sendJsonMessage, lastJsonMessage }) => {
   const mapSettings = map();
   const radius = 50 * 1.5;
+  const { GRID_SIZE, CANVAS_SIZE, STEP } = map();
 
   const { angle } = useCursorAngleTracker();
 
@@ -113,17 +110,16 @@ const Canvass = ({ isOpen, sendJsonMessage, lastJsonMessage }) => {
   }, []);
 
   useEffect(() => {
-    console.log(keyPressed);
-    if (keyPressed.rightMouseButton) {
-      setBlock(angle);
-    } else {
-      updateHandPosition(angle);
+    if (!isOpen) {
+      if (keyPressed.rightMouseButton) {
+        setBlock(angle);
+      } else {
+        updateHandPosition(angle);
+      }
     }
-  }, [angle,keyPressed.rightMouseButton]);
+  }, [angle, keyPressed.rightMouseButton]);
 
   useEffect(() => {
-    // console.log(lastJsonMessage);
-
     if (lastJsonMessage) {
       switch (lastJsonMessage.type) {
         case "positionChange":
@@ -165,10 +161,8 @@ const Canvass = ({ isOpen, sendJsonMessage, lastJsonMessage }) => {
       if (deltaX !== 0 || deltaY !== 0) {
         setStagePos((prevPos) => {
           const newPos = { x: prevPos.x + deltaX, y: prevPos.y + deltaY };
-          // Ограничиваем движение, чтобы сцена не выходила за пределы канваса
           newPos.x = Math.max(0, Math.min(CANVAS_SIZE, newPos.x));
           newPos.y = Math.max(0, Math.min(CANVAS_SIZE, newPos.y));
-          // console.log(newPos);
           return newPos;
         });
       }
@@ -191,7 +185,7 @@ const Canvass = ({ isOpen, sendJsonMessage, lastJsonMessage }) => {
             i + halfScreenWidth - stagePos.x,
             CANVAS_SIZE + halfScreenHeight - stagePos.y,
           ]}
-          stroke="#ddd"
+          stroke="#bfbdbd"
           strokeWidth={1}
         />
       );
@@ -204,7 +198,7 @@ const Canvass = ({ isOpen, sendJsonMessage, lastJsonMessage }) => {
             CANVAS_SIZE + halfScreenWidth - stagePos.x,
             i + halfScreenHeight - stagePos.y,
           ]}
-          stroke="#ddd"
+          stroke="#bfbdbd"
           strokeWidth={1}
         />
       );
@@ -217,9 +211,7 @@ const Canvass = ({ isOpen, sendJsonMessage, lastJsonMessage }) => {
       style={{
         width: "100vw",
         height: "100vh",
-        // touchAction: "pan-y",
         overflow: "hidden",
-        pointerEvents: "none",
       }}
     >
       <Stage x={0} y={0} width={CANVAS_SIZE} height={CANVAS_SIZE}>

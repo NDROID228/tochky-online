@@ -1,21 +1,3 @@
-// const http = require("http");
-// const { WebSocketServer } = require("ws");
-// const url = require("url");
-
-// const server = http.createServer();
-// const wsServer = new WebSocketServer({ server });
-// const port = 8080;
-
-// wsServer.on("connection", (connection, request) => {
-//   // ws://localhost:8080
-//   const { username } = url.parse(request.url, true).query;
-//   console.log(username);
-// });
-
-// server.listen(port, () => {
-//   console.log(`WebSocket сервер запущен на порту ${port}`);
-// });
-
 const WebSocket = require("ws"); // Імпорт модуля WebSocket для Node.js
 const wss = new WebSocket.Server({ port: 8080 }); // Створення WebSocket сервера на порту 8080
 const uuidv4 = require("uuid").v4; // Імпорт функції генерації UUID v4 з модуля uuid
@@ -24,23 +6,32 @@ const connections = {}; // Об'єкт для зберігання з'єднан
 const users = {}; // Об'єкт для зберігання інформації про користувачів
 
 // Налаштування параметрів сцени та руху
-const GRID_SIZE = 150; // Розмір ячейки сітки
-const CANVAS_SIZE = 3000; // Розмір канвасу
-const STEP = 3; // Крок руху
-const stagePos = { x: CANVAS_SIZE / 2, y: CANVAS_SIZE / 2 }; // Початкові координати сцени
-
+// const GRID_SIZE = 150;
+// // const GRID_SIZE = 150; // Розмір ячейки сітки
+// const CANVAS_SIZE = 3000; // Розмір канвасу
+// const STEP = 3; // Крок руху
+// const stagePos = { x: CANVAS_SIZE / 2, y: CANVAS_SIZE / 2 }; // Початкові координати сцени
+const mapSettings = {
+  GRID_SIZE: 150,
+  CANVAS_SIZE: 3000,
+  STEP: 3,
+  stagePos: { x: 1500, y: 1500 }, // Значення за замовчуванням або попередньо встановлені значення
+};
 // Обробник реєстрації нового користувача
 const userRegHandler = (...params) => {
   const [ws, name, uuid] = params;
   connections[uuid] = ws;
   users[uuid] = {
     username: name,
-    position: { x: CANVAS_SIZE / 2, y: CANVAS_SIZE / 2 }, // Початкова позиція користувача
+    position: {
+      x: mapSettings.CANVAS_SIZE / 2,
+      y: mapSettings.CANVAS_SIZE / 2,
+    }, // Початкова позиція користувача
     keyPressed: {}, // Об'єкт для зберігання натисканих клавіш
   };
   return;
 };
-
+console.log(users);
 // Обробник подій натискання клавіш
 const keyEventHandler = (...params) => {
   const [ws, keyEvent, key, uuid] = params;
@@ -90,11 +81,19 @@ wss.on("connection", function connection(ws) {
         const { key, eventType } = messageObj.body;
         keyEventHandler(ws, eventType, key, uuid); // Виклик обробника подій натискання клавіш
         break;
+      case "mapSettings":
+        const { GRID_SIZE, CANVAS_SIZE, STEP } = messageObj.body;
+        mapSettings.GRID_SIZE = GRID_SIZE;
+        mapSettings.CANVAS_SIZE = CANVAS_SIZE;
+        mapSettings.STEP = STEP;
+        
+        console.log(mapSettings);
+        break;
       default:
         break;
     }
 
-    console.log("Получено сообщение от клиента:", messageObj); // Виведення отриманого повідомлення (для відладки)
+    console.log("Получено сообщение от клиента:", messageObj);
   });
 
   ws.on("close", function close() {

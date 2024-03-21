@@ -94,25 +94,32 @@
 // };
 
 // export default MainApp;
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useLayoutEffect } from "react";
 import "./MainMenu.css";
 import useRandomNumbers from "../../usefulFunctions/Generate4Numbers";
 import Canvass from "../../ui/Canvas/Canvas";
 import useWebSocket from "react-use-websocket";
-
+import map from "../../store/mapStore";
 const MainApp = () => {
   useEffect(() => {
     const disableContextMenu = (event) => {
       event.preventDefault();
     };
 
-    document.addEventListener('contextmenu', disableContextMenu);
+    document.addEventListener("contextmenu", disableContextMenu);
 
     return () => {
-      document.removeEventListener('contextmenu', disableContextMenu);
+      document.removeEventListener("contextmenu", disableContextMenu);
     };
   }, []);
+  useLayoutEffect(() => {
+    sendJsonMessage({
+      type: "mapSettings",
+      body: { GRID_SIZE: GRID_SIZE, CANVAS_SIZE: CANVAS_SIZE, STEP: STEP },
+    });
 
+    return () => {};
+  }, []);
 
   // websocket configuration
   const socketUrl = "ws://localhost:8080";
@@ -129,29 +136,32 @@ const MainApp = () => {
     //Will attempt to reconnect on all close events, such as server shutting down
     shouldReconnect: (closeEvent) => true,
   });
-  // user init logic
+
   const [isOpen, setIsOpen] = useState(true);
   const { concatenatedNumber } = useRandomNumbers();
   const [username, setUsername] = useState("");
+  const { GRID_SIZE, CANVAS_SIZE, STEP } = map();
+  // console.log(GRID_SIZE);
   const handleChange = (event) => {
     setUsername(event.target.value);
   };
   const submitHandler = (event) => {
     event.preventDefault();
     setIsOpen(false);
+
     if (username) {
       document.cookie = `currentUsername=${username}`;
       sendJsonMessage({
         type: "userReg",
         body: { name: username },
-      })
+      });
     } else {
-      const userWithoutName = `Player_${concatenatedNumber}`
+      const userWithoutName = `Player_${concatenatedNumber}`;
       document.cookie = `currentUsername=${userWithoutName}`;
       sendJsonMessage({
         type: "userReg",
         body: { name: userWithoutName },
-      })
+      });
     }
   };
 

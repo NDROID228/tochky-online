@@ -1,16 +1,12 @@
 import { makeAutoObservable } from "mobx";
 
 const map = () => {
-    const mapSettings = makeAutoObservable({
-        currentX: 0,
-        currentY: 0,
-        setCurrentPosition(newPos) {
-            // { x, y } = newPos; // Destructure the object
-            this.currentX = newPos.x; // Use lowercase x and y
-            this.currentY = newPos.y;
-        },
-    });
-    return mapSettings; // Return the observable object
+  const mapSettings = makeAutoObservable({
+    GRID_SIZE: 250,
+    CANVAS_SIZE: 3000,
+    STEP: 2,
+  });
+  return mapSettings;
 };
 
 export default map;
