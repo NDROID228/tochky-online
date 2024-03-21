@@ -101,6 +101,19 @@ import Canvass from "../../ui/Canvas/Canvas";
 import useWebSocket from "react-use-websocket";
 
 const MainApp = () => {
+  useEffect(() => {
+    const disableContextMenu = (event) => {
+      event.preventDefault();
+    };
+
+    document.addEventListener('contextmenu', disableContextMenu);
+
+    return () => {
+      document.removeEventListener('contextmenu', disableContextMenu);
+    };
+  }, []);
+
+
   // websocket configuration
   const socketUrl = "ws://localhost:8080";
   const {

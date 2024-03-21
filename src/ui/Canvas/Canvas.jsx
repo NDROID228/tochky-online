@@ -7,6 +7,12 @@ const GRID_SIZE = 150; // Размер ячейки сетки
 const CANVAS_SIZE = 3000; // Размер канваса
 const STEP = 3; // Шаг движения
 
+const calculateCoordinates = (angle, radius) => {
+  const x = radius * Math.cos((angle * Math.PI) / 180);
+  const y = radius * Math.sin((angle * Math.PI) / 180);
+  return { x, y };
+};
+
 const Canvass = ({ isOpen, sendJsonMessage, lastJsonMessage }) => {
   const mapSettings = map();
   const radius = 50 * 1.5;
@@ -23,32 +29,27 @@ const Canvass = ({ isOpen, sendJsonMessage, lastJsonMessage }) => {
     secondHand: { x: -50, y: 50 },
   });
 
-  const calculateCoordinates = (angle) => {
-    const x = radius * Math.cos((angle * Math.PI) / 180);
-    const y = radius * Math.sin((angle * Math.PI) / 180);
-    return { x, y };
-  };
-
   const updateHandPosition = (angle) => {
-    const firstHandPos = calculateCoordinates(-angle + 45);
-    const secondHandPos = calculateCoordinates(-angle - 45); // Размещаем вторую руку на противоположной стороне
+    const firstHandPos = calculateCoordinates(-angle + 45, radius);
+    const secondHandPos = calculateCoordinates(-angle - 45, radius);
     setHandPos({ firstHand: firstHandPos, secondHand: secondHandPos });
   };
-
-  useEffect(() => {
-    updateHandPosition(angle);
-  }, [angle]);
+  const setBlock = (angle) => {
+    const firstHandPos = calculateCoordinates(-angle + 15, radius);
+    const secondHandPos = calculateCoordinates(-angle - 15, radius);
+    setHandPos({ firstHand: firstHandPos, secondHand: secondHandPos });
+  };
 
   useEffect(() => {
     const handleClickDown = (event) => {
       if (!event.repeat) {
         if (event.type === "mousedown") {
           const button =
-            event.button == 0 ? "leftMouseButton" : "rightMouseButton";
-          setKeyPressed((prev) => ({ ...prev, [button]: false }));
+            event.button === 0 ? "leftMouseButton" : "rightMouseButton";
+          setKeyPressed((prev) => ({ ...prev, [button]: true }));
           sendJsonMessage({
             type: "keyEvent",
-            body: { key: button, eventType: "keyup" },
+            body: { key: button, eventType: "keydown" },
           });
         } else {
           setKeyPressed((prev) => ({ ...prev, [event.key]: true }));
@@ -63,8 +64,7 @@ const Canvass = ({ isOpen, sendJsonMessage, lastJsonMessage }) => {
     const handleClickUp = (event) => {
       if (event.type === "mouseup") {
         const button =
-          event.button == 0 ? "leftMouseButton" : "rightMouseButton";
-        // console.log(button);
+          event.button === 0 ? "leftMouseButton" : "rightMouseButton";
         setKeyPressed((prev) => ({ ...prev, [button]: false }));
         sendJsonMessage({
           type: "keyEvent",
@@ -79,51 +79,50 @@ const Canvass = ({ isOpen, sendJsonMessage, lastJsonMessage }) => {
       }
     };
 
+    const handleMouseClick = (event) => {
+      if (event.type === "mousedown") {
+        const button =
+          event.button === 0 ? "leftMouseButton" : "rightMouseButton";
+        setKeyPressed((prev) => ({ ...prev, [button]: true }));
+        sendJsonMessage({
+          type: "keyEvent",
+          body: { key: button, eventType: "keydown" },
+        });
+      } else {
+        const button =
+          event.button === 0 ? "leftMouseButton" : "rightMouseButton";
+        setKeyPressed((prev) => ({ ...prev, [button]: false }));
+        sendJsonMessage({
+          type: "keyEvent",
+          body: { key: button, eventType: "keyup" },
+        });
+      }
+    };
+
     window.addEventListener("keydown", handleClickDown);
     window.addEventListener("keyup", handleClickUp);
-    window.addEventListener("mousedown", handleClickDown);
-    window.addEventListener("mouseup", handleClickUp);
+    window.addEventListener("mousedown", handleMouseClick);
+    window.addEventListener("mouseup", handleMouseClick);
 
     return () => {
       window.removeEventListener("keydown", handleClickDown);
       window.removeEventListener("keyup", handleClickUp);
-      window.removeEventListener("mousedown", handleClickDown);
-      window.removeEventListener("mouseup", handleClickUp);
+      window.removeEventListener("mousedown", handleMouseClick);
+      window.removeEventListener("mouseup", handleMouseClick);
     };
   }, []);
 
-  // функція анімації блоку
-  const blockUpCalc = (degree) => {
-    const DEG_TO_RADIANS = 0.0174532925;
-    const RADIUS = 50 * Math.SQRT2;
-    let x1 = Math.cos((degree + 30) * DEG_TO_RADIANS) * RADIUS;
-    let y1 = Math.sin((degree + 30) * DEG_TO_RADIANS) * RADIUS;
-    let x2 = Math.cos((degree + 60) * DEG_TO_RADIANS) * RADIUS;
-    let y2 = Math.sin((degree + 60) * DEG_TO_RADIANS) * RADIUS;
-
-    setHandPos({
-      firstHand: { x: x1, y: y1 * -1 },
-      secondHand: { x: x2, y: y2 * -1 },
-    });
-    return;
-  };
-  // розкоментуй для тесту двох функцій вище
-  // useEffect(() => {
-  //   const timeout = setTimeout(() => {
-  //     setDeg(deg + 10);
-  //   }, 500)
-  //   if(deg % 20 == 0) {
-  //     rotationCalc(deg);
-  //   } else {
-  //     blockUpCalc(deg);
-  //   }
-  //   return () => {
-  //     clearTimeout(timeout);
-  //   }
-  // }, [deg]);
+  useEffect(() => {
+    console.log(keyPressed);
+    if (keyPressed.rightMouseButton) {
+      setBlock(angle);
+    } else {
+      updateHandPosition(angle);
+    }
+  }, [angle,keyPressed.rightMouseButton]);
 
   useEffect(() => {
-    console.log(lastJsonMessage);
+    // console.log(lastJsonMessage);
 
     if (lastJsonMessage) {
       switch (lastJsonMessage.type) {
@@ -141,7 +140,7 @@ const Canvass = ({ isOpen, sendJsonMessage, lastJsonMessage }) => {
     const moveStage = () => {
       let deltaX = 0;
       let deltaY = 0;
-      // console.log(keyPressed);
+
       const numKeysPressed = Object.values(keyPressed).filter(
         (val) => val
       ).length;
@@ -220,6 +219,7 @@ const Canvass = ({ isOpen, sendJsonMessage, lastJsonMessage }) => {
         height: "100vh",
         // touchAction: "pan-y",
         overflow: "hidden",
+        pointerEvents: "none",
       }}
     >
       <Stage x={0} y={0} width={CANVAS_SIZE} height={CANVAS_SIZE}>
