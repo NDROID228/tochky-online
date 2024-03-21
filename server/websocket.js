@@ -6,16 +6,11 @@ const connections = {}; // Об'єкт для зберігання з'єднан
 const users = {}; // Об'єкт для зберігання інформації про користувачів
 
 // Налаштування параметрів сцени та руху
-// const GRID_SIZE = 150;
-// // const GRID_SIZE = 150; // Розмір ячейки сітки
-// const CANVAS_SIZE = 3000; // Розмір канвасу
-// const STEP = 3; // Крок руху
-// const stagePos = { x: CANVAS_SIZE / 2, y: CANVAS_SIZE / 2 }; // Початкові координати сцени
 const mapSettings = {
   GRID_SIZE: 150,
   CANVAS_SIZE: 3000,
   STEP: 3,
-  stagePos: { x: 1500, y: 1500 }, // Значення за замовчуванням або попередньо встановлені значення
+  stagePos: { x: 1500, y: 1500 },
 };
 // Обробник реєстрації нового користувача
 const userRegHandler = (...params) => {
@@ -59,9 +54,8 @@ const keyEventHandler = (...params) => {
 
 // Обробник закриття з'єднання з користувачем
 const closeHandler = (uuid) => {
-  delete connections[uuid]; // Видалення з'єднання з об'єкта з'єднань
-  delete users[uuid]; // Видалення користувача з об'єкта користувачів
-  return;
+  delete connections[uuid];
+  delete users[uuid];
 };
 
 // Обробник підключення нового клієнта до WebSocket сервера
@@ -86,7 +80,7 @@ wss.on("connection", function connection(ws) {
         mapSettings.GRID_SIZE = GRID_SIZE;
         mapSettings.CANVAS_SIZE = CANVAS_SIZE;
         mapSettings.STEP = STEP;
-        
+
         console.log(mapSettings);
         break;
       default:
@@ -96,8 +90,10 @@ wss.on("connection", function connection(ws) {
     console.log("Получено сообщение от клиента:", messageObj);
   });
 
+  
+  // Виклик обробника закриття з'єднання з користувачем
   ws.on("close", function close() {
-    closeHandler(uuid); // Виклик обробника закриття з'єднання з користувачем
+    closeHandler(uuid);
   });
 });
 
