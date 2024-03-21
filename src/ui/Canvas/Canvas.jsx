@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Stage, Layer, Rect, Line, Circle, Group } from "react-konva";
 import map from "../../store/mapStore";
+import useCursorAngleTracker from "../../hooks/useCursorAngleTracker";
 
 const GRID_SIZE = 150; // Размер ячейки сетки
 const CANVAS_SIZE = 3000; // Размер канваса
@@ -8,11 +9,35 @@ const STEP = 3; // Шаг движения
 
 const Canvass = ({ isOpen, sendJsonMessage, lastJsonMessage }) => {
   const mapSettings = map();
+  const radius = 50 * 1.5;
+
+  const { angle } = useCursorAngleTracker();
+
   const [stagePos, setStagePos] = useState({
     x: CANVAS_SIZE / 2,
     y: CANVAS_SIZE / 2,
   });
   const [keyPressed, setKeyPressed] = useState({});
+  const [handPos, setHandPos] = useState({
+    firstHand: { x: -50, y: -50 },
+    secondHand: { x: -50, y: 50 },
+  });
+
+  const calculateCoordinates = (angle) => {
+    const x = radius * Math.cos((angle * Math.PI) / 180);
+    const y = radius * Math.sin((angle * Math.PI) / 180);
+    return { x, y };
+  };
+
+  const updateHandPosition = (angle) => {
+    const firstHandPos = calculateCoordinates(-angle + 45);
+    const secondHandPos = calculateCoordinates(-angle - 45); // Размещаем вторую руку на противоположной стороне
+    setHandPos({ firstHand: firstHandPos, secondHand: secondHandPos });
+  };
+
+  useEffect(() => {
+    updateHandPosition(angle);
+  }, [angle]);
 
   useEffect(() => {
     const handleClickDown = (event) => {
@@ -20,7 +45,6 @@ const Canvass = ({ isOpen, sendJsonMessage, lastJsonMessage }) => {
         if (event.type === "mousedown") {
           const button =
             event.button == 0 ? "leftMouseButton" : "rightMouseButton";
-          // console.log(button);
           setKeyPressed((prev) => ({ ...prev, [button]: false }));
           sendJsonMessage({
             type: "keyEvent",
@@ -68,28 +92,6 @@ const Canvass = ({ isOpen, sendJsonMessage, lastJsonMessage }) => {
     };
   }, []);
 
-  
-  const [handPos, setHandPos] = useState({
-    firstHand: { x: -50, y: -50 },
-    secondHand: { x: -50, y: 50 },
-  });
-  const [deg, setDeg] = useState(0);
-  // функція анімації повороту
-  const rotationCalc = (degree) => {
-    console.log(degree);
-    const DEG_TO_RADIANS = 0.0174532925;
-    const RADIUS = 50 * Math.SQRT2;
-    let x1 = Math.cos(degree * DEG_TO_RADIANS) * RADIUS;
-    let y1 = Math.sin(degree * DEG_TO_RADIANS) * RADIUS;
-    let x2 = Math.cos((degree + 90) * DEG_TO_RADIANS) * RADIUS;
-    let y2 = Math.sin((degree + 90) * DEG_TO_RADIANS) * RADIUS;
-
-    setHandPos({
-      firstHand: { x: x1, y: y1 * -1 },
-      secondHand: { x: x2, y: y2 * -1 },
-    });
-    return;
-  };
   // функція анімації блоку
   const blockUpCalc = (degree) => {
     const DEG_TO_RADIANS = 0.0174532925;
@@ -179,8 +181,7 @@ const Canvass = ({ isOpen, sendJsonMessage, lastJsonMessage }) => {
     const lines = [];
     const halfScreenHeight = innerHeight / 2;
     const halfScreenWidth = innerWidth / 2;
-    // stagePos.y = halfScreenHeight;
-    // console.log(lines);
+
     for (let i = 0; i <= CANVAS_SIZE; i += GRID_SIZE) {
       lines.push(
         <Line
@@ -228,7 +229,7 @@ const Canvass = ({ isOpen, sendJsonMessage, lastJsonMessage }) => {
             y={0}
             width={CANVAS_SIZE}
             height={CANVAS_SIZE}
-            fill="#fff"
+            fill="#d4fad9"
           />
 
           {renderGrid()}
@@ -237,42 +238,21 @@ const Canvass = ({ isOpen, sendJsonMessage, lastJsonMessage }) => {
               x={handPos["firstHand"].x}
               y={handPos["firstHand"].y}
               radius={10}
-              fill="#465360"
+              fill="#5e5e5e"
             ></Circle>
             <Circle
               x={handPos["secondHand"].x}
               y={handPos["secondHand"].y}
               radius={10}
-              fill="#385329"
+              fill="#5e5e5e"
             ></Circle>
             <Circle
-              // x={window.innerWidth / 2}
-              // y={window.innerHeight / 2}
               radius={50} // Радиус кружка
-              fill="red"
+              fill="#ababab"
             />
           </Group>
         </Layer>
       </Stage>
-      {/* <Stage x={0} y={0} width={window.innerWidth} height={window.innerHeight}>
-        <Layer>
-          <Rect
-            x={0}
-            y={0}
-            width={500}
-            height={500}
-            fill="black"
-          />
-
-          <Circle
-            x={2} 
-            y={2}
-            radius={500} // Радиус кружка
-            fill="red"
-          />
-          {renderGrid()}
-        </Layer>
-      </Stage> */}
     </div>
   );
 };
