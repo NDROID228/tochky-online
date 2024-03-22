@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Stage, Layer, Rect, Line, Circle, Group } from "react-konva";
 import map from "../../store/mapStore";
 import useCursorAngleTracker from "../../hooks/useCursorAngleTracker";
+import Player from './../Game/Player/Player';
 
 const calculateCoordinates = (angle, radius) => {
   const x = radius * Math.cos((angle * Math.PI) / 180);
@@ -225,24 +226,8 @@ const Canvass = ({ isOpen, sendJsonMessage, lastJsonMessage }) => {
           />
 
           {renderGrid()}
-          <Group x={window.innerWidth / 2} y={window.innerHeight / 2}>
-            <Circle
-              x={handPos["firstHand"].x}
-              y={handPos["firstHand"].y}
-              radius={10}
-              fill="#5e5e5e"
-            ></Circle>
-            <Circle
-              x={handPos["secondHand"].x}
-              y={handPos["secondHand"].y}
-              radius={10}
-              fill="#5e5e5e"
-            ></Circle>
-            <Circle
-              radius={50} // Радиус кружка
-              fill="#ababab"
-            />
-          </Group>
+          
+          <Player handPos={handPos} />
         </Layer>
       </Stage>
     </div>
