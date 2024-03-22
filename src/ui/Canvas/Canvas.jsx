@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 import { Stage, Layer, Rect, Line, Circle, Group } from "react-konva";
 import map from "../../store/mapStore";
+import userStore from "../../store/usersStore";
 import useCursorAngleTracker from "../../hooks/useCursorAngleTracker";
 
 const calculateCoordinates = (angle, radius) => {
@@ -13,18 +14,28 @@ const Canvass = ({ isOpen, sendJsonMessage, lastJsonMessage }) => {
   const mapSettings = map();
   const radius = 50 * 1.5;
   const { GRID_SIZE, CANVAS_SIZE, STEP } = map();
-
   const { angle } = useCursorAngleTracker();
-
   const [stagePos, setStagePos] = useState({
     x: CANVAS_SIZE / 2,
     y: CANVAS_SIZE / 2,
   });
+  const currentUser = userStore.getCurrentUser()
   const [keyPressed, setKeyPressed] = useState({});
   const [handPos, setHandPos] = useState({
     firstHand: { x: -50, y: -50 },
     secondHand: { x: -50, y: 50 },
   });
+
+
+  useEffect(() => {
+    if (lastJsonMessage && lastJsonMessage.type === "registration" && !currentUser) {
+      userStore.setCurrentUser(lastJsonMessage.body.userId);
+    }
+    if (lastJsonMessage && lastJsonMessage.type === "userListUpdate" ) {
+      console.log(lastJsonMessage.body.usersData);
+    }
+    
+  }, [lastJsonMessage]);
 
   const updateHandPosition = (angle) => {
     const firstHandPos = calculateCoordinates(-angle + 45, radius);
@@ -120,18 +131,6 @@ const Canvass = ({ isOpen, sendJsonMessage, lastJsonMessage }) => {
   }, [angle, keyPressed.rightMouseButton]);
 
   useEffect(() => {
-    if (lastJsonMessage) {
-      switch (lastJsonMessage.type) {
-        case "positionChange":
-          break;
-
-        default:
-          break;
-      }
-    }
-  }, [lastJsonMessage]);
-
-  useEffect(() => {
     if (isOpen) return;
     const moveStage = () => {
       let deltaX = 0;
@@ -153,8 +152,6 @@ const Canvass = ({ isOpen, sendJsonMessage, lastJsonMessage }) => {
         deltaX = STEP;
       }
       if (numKeysPressed >= 2) {
-        // deltaX /= 2;
-        // deltaY /= 2;
         deltaX /= 1.4;
         deltaY /= 1.4;
       }
@@ -169,6 +166,19 @@ const Canvass = ({ isOpen, sendJsonMessage, lastJsonMessage }) => {
     };
     moveStage();
   }, [keyPressed, stagePos.y, stagePos.x, mapSettings]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      sendJsonMessage({
+        type: "currentUserPosition",
+        body: {
+          userUID: currentUser,
+          x: stagePos.x,
+          y: stagePos.y,
+        },
+      });
+    }
+  }, [stagePos]);
 
   const renderGrid = () => {
     const lines = [];

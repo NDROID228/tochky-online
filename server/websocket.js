@@ -12,18 +12,26 @@ const mapSettings = {
   STEP: 3,
   stagePos: { x: 1500, y: 1500 },
 };
+
 // Обробник реєстрації нового користувача
 const userRegHandler = (...params) => {
   const [ws, name, uuid] = params;
   connections[uuid] = ws;
   users[uuid] = {
+    uid: "",
     username: name,
     position: {
       x: mapSettings.CANVAS_SIZE / 2,
       y: mapSettings.CANVAS_SIZE / 2,
-    }, // Початкова позиція користувача
-    keyPressed: {}, // Об'єкт для зберігання натисканих клавіш
+    },
+    keyPressed: {},
   };
+  ws.send(
+    JSON.stringify({
+      type: "registration",
+      body: { userId: uuid },
+    })
+  );
   return;
 };
 console.log(users);
@@ -60,7 +68,6 @@ const closeHandler = (uuid) => {
 
 // Обробник підключення нового клієнта до WebSocket сервера
 wss.on("connection", function connection(ws) {
-  console.log("Новий клієнт підключений");
   const uuid = uuidv4(); // Генерація унікального ідентифікатора користувача
 
   ws.on("message", function incoming(bytes) {
@@ -80,8 +87,34 @@ wss.on("connection", function connection(ws) {
         mapSettings.GRID_SIZE = GRID_SIZE;
         mapSettings.CANVAS_SIZE = CANVAS_SIZE;
         mapSettings.STEP = STEP;
-
-        console.log(mapSettings);
+        break;
+      case "currentUserPosition":
+        const { userUID, x, y } = messageObj.body;
+        const usersData = [];
+        for (let user in users) {
+          if (users.hasOwnProperty(user)) {
+            const userData = users[user];
+            // Если находим пользователя с нужным userUID
+            if (user === userUID) {
+              // Меняем его позицию
+              if (!userData.position) {
+                userData.position = {};
+              }
+              userData.position.x = x;
+              userData.position.y = y;
+              userData.uid = user;
+            }
+            // Добавляем пользователя в массив пользователей
+            usersData.push(userData);
+          }
+        }
+        // Отправляем обновленные данные о всех пользователях
+        ws.send(
+          JSON.stringify({
+            type: "userListUpdate",
+            body: { usersData: usersData },
+          })
+        );
         break;
       default:
         break;
@@ -90,7 +123,6 @@ wss.on("connection", function connection(ws) {
     console.log("Получено сообщение от клиента:", messageObj);
   });
 
-  
   // Виклик обробника закриття з'єднання з користувачем
   ws.on("close", function close() {
     closeHandler(uuid);
