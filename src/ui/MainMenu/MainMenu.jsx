@@ -143,7 +143,9 @@ const MainApp = () => {
       body: { GRID_SIZE: GRID_SIZE, CANVAS_SIZE: CANVAS_SIZE, STEP: STEP },
     });
   }, [GRID_SIZE,CANVAS_SIZE,STEP]);
-  // console.log(GRID_SIZE);
+
+
+  
   const handleChange = (event) => {
     setUsername(event.target.value);
   };

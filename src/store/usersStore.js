@@ -1,16 +1,18 @@
 import { makeAutoObservable } from "mobx";
 
-const userStore = () => {
-  const user = makeAutoObservable({
-    user: {
-        name:"",
-    },
+class UserStore {
+  currentUser = null;
+  constructor() {
+    makeAutoObservable(this);
+  }
+  setCurrentUser(userId) {
+    this.currentUser = userId;
+  }
 
-    addUser(user) {
-      this.user.push(user);
-    },
-  });
-  return user;
-};
+  getCurrentUser() {
+    return this.currentUser;
+  }
+}
 
+const userStore = new UserStore();
 export default userStore;
