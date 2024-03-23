@@ -1,11 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { Group, Circle } from "react-konva";
-
-const calculateCoordinates = (angle, radius) => {
-  const x = radius * Math.cos((angle * Math.PI) / 180);
-  const y = radius * Math.sin((angle * Math.PI) / 180);
-  return { x, y };
-};
+import calculateCoordinates from "../../../usefulFunctions/calculateCoordinates";
 
 const Player = ({ handPos, angle }) => {
   const eyesPos = useRef({
@@ -30,9 +25,15 @@ const Player = ({ handPos, angle }) => {
   const updateEyesCords = (angle) => {
     const angleEyesDiff = 35;
     const leftEyePos = calculateCoordinates(-angle - angleEyesDiff, 30);
-    const leftEyePupilPos = calculateCoordinates(-angle - angleEyesDiff + 5, 33);
+    const leftEyePupilPos = calculateCoordinates(
+      -angle - angleEyesDiff + 5,
+      33
+    );
     const rightEyePos = calculateCoordinates(-angle + angleEyesDiff, 30);
-    const rightEyePupilPos = calculateCoordinates(-angle + angleEyesDiff - 5, 33);
+    const rightEyePupilPos = calculateCoordinates(
+      -angle + angleEyesDiff - 5,
+      33
+    );
     eyesPos.current = {
       leftEye: leftEyePos,
       leftEyePupil: leftEyePupilPos,
@@ -52,7 +53,11 @@ const Player = ({ handPos, angle }) => {
         radius={50} // Радиус кружка
         fill="#ababab"
       />
-      <Circle radius={45} fill="#ffdd9f" />
+      <Circle
+        radius={45}
+        //   fill="#99D5F2"
+        fill="#ECD6B6"
+      />
 
       <Circle
         radius={14}
@@ -64,7 +69,7 @@ const Player = ({ handPos, angle }) => {
         radius={8}
         x={eyesPos.current.leftEyePupil.x}
         y={eyesPos.current.leftEyePupil.y}
-        fill="#000000"
+        fill="#0D0D0D"
       />
       <Circle
         radius={14}
@@ -76,7 +81,7 @@ const Player = ({ handPos, angle }) => {
         radius={8}
         x={eyesPos.current.rightEyePupil.x}
         y={eyesPos.current.rightEyePupil.y}
-        fill="#000000"
+        fill="#0D0D0D"
       />
 
       <Circle

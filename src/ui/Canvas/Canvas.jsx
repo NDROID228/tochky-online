@@ -4,12 +4,8 @@ import map from "../../store/mapStore";
 import userStore from "../../store/usersStore";
 import useCursorAngleTracker from "../../hooks/useCursorAngleTracker";
 import Player from "./../Game/Player/Player";
+import calculateCoordinates from './../../usefulFunctions/calculateCoordinates';
 
-const calculateCoordinates = (angle, radius) => {
-  const x = radius * Math.cos((angle * Math.PI) / 180);
-  const y = radius * Math.sin((angle * Math.PI) / 180);
-  return { x, y };
-};
 
 const Canvass = ({ isOpen, sendJsonMessage, lastJsonMessage }) => {
   const mapSettings = map();
