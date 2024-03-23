@@ -233,7 +233,7 @@ const Canvass = ({ isOpen, sendJsonMessage, lastJsonMessage }) => {
 
           {renderGrid()}
 
-          <Player handPos={handPos} angle={angle} />
+          <Player handPos={handPos} angle={angle} isOpen={isOpen} />
         </Layer>
       </Stage>
     </div>

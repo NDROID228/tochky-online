@@ -2,23 +2,23 @@ import React, { useEffect, useRef } from "react";
 import { Group, Circle } from "react-konva";
 import calculateCoordinates from "../../../usefulFunctions/calculateCoordinates";
 
-const Player = ({ handPos, angle }) => {
+const Player = ({ handPos, angle = 180, isOpen = false }) => {
   const eyesPos = useRef({
     leftEye: {
-      x: 0,
-      y: 0,
+      x: -24.648185364002206,
+      y: 17.10166536515632,
     },
     leftEyePupil: {
-      x: 0,
-      y: 0,
+      x: -28.649389916756025,
+      y: 16.377193208779037,
     },
     rightEye: {
-      x: 0,
-      y: 0,
+      x: -24.500484637701028,
+      y: -17.31260386301771,
     },
     rightEyePupil: {
-      x: 0,
-      y: 0,
+      x: -28.507760319866644,
+      y: -16.622502866446947,
     },
   });
 
@@ -43,8 +43,9 @@ const Player = ({ handPos, angle }) => {
   };
 
   useEffect(() => {
-    console.log(calculateCoordinates(angle, 50));
-    updateEyesCords(angle);
+    if (!isOpen) {
+      updateEyesCords(angle);
+    }
   }, [angle]);
 
   return (
