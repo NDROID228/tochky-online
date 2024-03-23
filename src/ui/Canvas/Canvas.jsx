@@ -14,27 +14,30 @@ const Canvass = ({ isOpen, sendJsonMessage, lastJsonMessage }) => {
   const mapSettings = map();
   const radius = 50 * 1.5;
   const { GRID_SIZE, CANVAS_SIZE, STEP } = map();
+  const currentUser = userStore.getCurrentUser();
   const { angle } = useCursorAngleTracker();
   const [stagePos, setStagePos] = useState({
     x: CANVAS_SIZE / 2,
     y: CANVAS_SIZE / 2,
   });
-  const currentUser = userStore.getCurrentUser()
   const [keyPressed, setKeyPressed] = useState({});
   const [handPos, setHandPos] = useState({
     firstHand: { x: -50, y: -50 },
     secondHand: { x: -50, y: 50 },
   });
-
-
+  const [usersCoordinatesList, setUsersCoordinatesList] = useState()
   useEffect(() => {
-    if (lastJsonMessage && lastJsonMessage.type === "registration" && !currentUser) {
+    if (
+      lastJsonMessage &&
+      lastJsonMessage.type === "registration" &&
+      !currentUser
+    ) {
       userStore.setCurrentUser(lastJsonMessage.body.userId);
     }
-    if (lastJsonMessage && lastJsonMessage.type === "userListUpdate" ) {
-      console.log(lastJsonMessage.body.usersData);
+    if (lastJsonMessage && lastJsonMessage.type === "userListUpdate") {
+      setUsersCoordinatesList(lastJsonMessage.body.usersData)
+      console.log(usersCoordinatesList);
     }
-    
   }, [lastJsonMessage]);
 
   const updateHandPosition = (angle) => {
@@ -175,10 +178,11 @@ const Canvass = ({ isOpen, sendJsonMessage, lastJsonMessage }) => {
           userUID: currentUser,
           x: stagePos.x,
           y: stagePos.y,
+          handsPosition: handPos
         },
       });
     }
-  }, [stagePos]);
+  }, [stagePos,currentUser]);
 
   const renderGrid = () => {
     const lines = [];
@@ -249,8 +253,16 @@ const Canvass = ({ isOpen, sendJsonMessage, lastJsonMessage }) => {
               fill="#5e5e5e"
             ></Circle>
             <Circle
-              radius={50} // Радиус кружка
+              radius={50} 
               fill="#ababab"
+            />
+          </Group>
+
+
+          <Group x={1500} y={1400}>
+            <Circle
+              radius={1000} 
+              fill="#ffff"
             />
           </Group>
         </Layer>

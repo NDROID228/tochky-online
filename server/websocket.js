@@ -24,6 +24,7 @@ const userRegHandler = (...params) => {
       x: mapSettings.CANVAS_SIZE / 2,
       y: mapSettings.CANVAS_SIZE / 2,
     },
+    handsPosition: "",
     keyPressed: {},
   };
   ws.send(
@@ -89,7 +90,7 @@ wss.on("connection", function connection(ws) {
         mapSettings.STEP = STEP;
         break;
       case "currentUserPosition":
-        const { userUID, x, y } = messageObj.body;
+        const { userUID, x, y, handsPosition } = messageObj.body;
         const usersData = [];
         for (let user in users) {
           if (users.hasOwnProperty(user)) {
@@ -103,6 +104,7 @@ wss.on("connection", function connection(ws) {
               userData.position.x = x;
               userData.position.y = y;
               userData.uid = user;
+              userData.handsPosition = handsPosition;
             }
             // Добавляем пользователя в массив пользователей
             usersData.push(userData);
