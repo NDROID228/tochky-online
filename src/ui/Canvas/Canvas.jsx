@@ -3,12 +3,9 @@ import { Stage, Layer, Rect, Line, Circle, Group } from "react-konva";
 import map from "../../store/mapStore";
 import userStore from "../../store/usersStore";
 import useCursorAngleTracker from "../../hooks/useCursorAngleTracker";
+import Player from "./../Game/Player/Player";
+import calculateCoordinates from './../../usefulFunctions/calculateCoordinates';
 
-const calculateCoordinates = (angle, radius) => {
-  const x = radius * Math.cos((angle * Math.PI) / 180);
-  const y = radius * Math.sin((angle * Math.PI) / 180);
-  return { x, y };
-};
 
 const Canvass = ({ isOpen, sendJsonMessage, lastJsonMessage }) => {
   const mapSettings = map();
@@ -239,32 +236,7 @@ const Canvass = ({ isOpen, sendJsonMessage, lastJsonMessage }) => {
           />
 
           {renderGrid()}
-          <Group x={window.innerWidth / 2} y={window.innerHeight / 2}>
-            <Circle
-              x={handPos["firstHand"].x}
-              y={handPos["firstHand"].y}
-              radius={10}
-              fill="#5e5e5e"
-            ></Circle>
-            <Circle
-              x={handPos["secondHand"].x}
-              y={handPos["secondHand"].y}
-              radius={10}
-              fill="#5e5e5e"
-            ></Circle>
-            <Circle
-              radius={50} 
-              fill="#ababab"
-            />
-          </Group>
-
-
-          <Group x={1500} y={1400}>
-            <Circle
-              radius={1000} 
-              fill="#ffff"
-            />
-          </Group>
+          <Player handPos={handPos} angle={angle} isOpen={isOpen} />
         </Layer>
       </Stage>
     </div>
